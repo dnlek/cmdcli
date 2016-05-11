@@ -6,6 +6,7 @@ import micromatch from 'micromatch';
 import findup from 'findup-sync';
 import path from 'path';
 import resolve from 'resolve';
+import os from 'os';
 
 const parentDir = path.dirname(module.parent.filename);
 const packageFile = findup('package.json', { cwd: parentDir });
