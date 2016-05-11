@@ -34,3 +34,44 @@ What is the name of application config file. By default library will locate this
 
 baseConfig (default: `{}`)  
 Base config object which will be overwritten by config files.
+
+## Commands:
+
+Sample command could look like this:
+```javascript
+export default class Command {
+  /**
+   * Pass all arguments to cmdcli
+   */
+  getArgs() {
+    return [
+      [['param'], {
+        action: 'store',
+        help: 'Sample param',
+      }],
+    ];
+  }
+
+  /**
+   * Optional print results function
+   * results - results passed from exec function
+   * args - Arguments parsed from command line - based on getArgs
+   * cfg - Application configuration read from config files
+   */
+  print(results, args, cfg) {
+    process.stdout.write("Print output from the exec command");
+  }
+
+  /**
+   * syncronous or asynchronous command execution function
+   * args - Arguments parsed from command line - based on getArgs
+   * cfg - Application configuration read from config files
+   */
+  exec(args, cfg) {
+
+    return new Promise((resolve) => {
+      resolve();
+    })
+  }
+}
+```
