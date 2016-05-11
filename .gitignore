@@ -1,0 +1,8 @@
+node_modules/
+dist/
+
+.data.json
+.aem
+.aemproject
+
+npm-debug.log
