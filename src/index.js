@@ -187,11 +187,12 @@ while (!command.isCommand) {
 }
 
 const config = Promise.all([
-  getConfig(GLOBAL_CONFIG_FILE),
-  getConfig(CONFIG_FILE),
+  getConfig(GLOBAL_CONFIG_FILE, path.resolve(process.cwd(), '..')),
+  getConfig(CONFIG_FILE, process.cwd()),
 ]).then((result) => (args.global ?
-    { ...BASE_CONFIG, ...result[1].data } :
-    { ...BASE_CONFIG, ...result[1].data, ...result[2].data }));
+    { ...BASE_CONFIG, ...result[0].data } :
+    { ...BASE_CONFIG, ...result[0].data, ...result[1].data })
+);
 
 let resolvedArgs = args;
 
