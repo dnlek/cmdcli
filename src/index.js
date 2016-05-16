@@ -190,8 +190,8 @@ const config = Promise.all([
   getConfig(GLOBAL_CONFIG_FILE),
   getConfig(CONFIG_FILE),
 ]).then((result) => (args.global ?
-    { ...BASE_CONFIG, ...result[1] } :
-    { ...BASE_CONFIG, ...result[1], ...result[2] }));
+    { ...BASE_CONFIG, ...result[1].data } :
+    { ...BASE_CONFIG, ...result[1].data, ...result[2].data }));
 
 let resolvedArgs = args;
 
