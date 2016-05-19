@@ -206,9 +206,11 @@ Promise.all([
 ]).then((result) => {
   args = result[0];
   const cfg = result[1];
-  Promise.resolve(command.exec(args, cfg)).then((results) => {
-    if (typeof command.print === 'function') {
-      command.print(results, args, cfg);
-    }
-  });
+  Promise.resolve(command.exec(args, cfg))
+    .then((results) => {
+      if (typeof command.print === 'function') {
+        command.print(results, args, cfg);
+      }
+    })
+    .catch(err => process.stderr.write(`Error while executing command: ${err}`));
 });
