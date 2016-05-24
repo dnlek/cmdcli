@@ -1,13 +1,13 @@
 # cmdcli
 
 Module which simplifies building of command line programs with multiple subcommands.
-Subcommands can be wither stored in local module or referenced as external modules
+Subcommands can be either stored in local module or referenced as external modules
 
 ## How to use
 
 * Create new npm module and add cmdcli as dependency.
 ```bash
-  npm i -S git+https://git@github.com:dnlek/cmdcli.git
+  npm i -S cmdcli
 ```
 * Create `bin/<app_name>` file with the following contents:
 ```bash
