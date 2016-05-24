@@ -80,7 +80,6 @@ export default class Command {
 Each command can have it's own set of positional and optional parameters.
 Here is how to define sample list of params:
 
-```
 ```javascript
 export default class Command {
   get args() {
