@@ -99,13 +99,18 @@ function mapInquirer(id, cfg, config) {
   return ret;
 }
 
-function isRequired(arg) {
-  return (arg[1].required || !arg[0].some((item) => item.indexOf('-') === 0));
+function isRequired(id, cfg) {
+  return (cfg.required || !id.some((item) => item.indexOf('-') === 0));
 }
 
 function mapArgparse(id, cfg) {
-  return (isRequired([id, cfg]) && typeof cfg.nargs === 'undefined') ?
-    { ...cfg, nargs: '?' } : cfg;
+  const isArgRequired = isRequired(id, cfg);
+  return {
+    ...(isArgRequired && { nargs: '?' }),
+    ...(isArgRequired && { action: 'store' }),
+    ...(!isArgRequired && { action: 'storeTrue' }),
+    ...cfg,
+  };
 }
 
 function argsSelector(cfg) {
