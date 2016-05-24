@@ -43,10 +43,9 @@ export default class Command {
   /**
    * Pass all arguments to cmdcli
    */
-  getArgs() {
+  get args() {
     return [
-      [['param'], {
-        action: 'store',
+      ['param', {
         help: 'Sample param',
       }],
     ];
@@ -72,6 +71,33 @@ export default class Command {
     return new Promise((resolve) => {
       resolve();
     })
+  }
+}
+```
+
+## Params
+
+Each command can have it's own set of positional and optional parameters.
+Here is how to define sample list of params:
+
+```
+```javascript
+export default class Command {
+  get args() {
+    return [
+      ['one'], // simple positional argument. By default action will be 'store'
+      ['-a', '--alpha'], // simple optional argument. By default optional arguments have action 'storeTrue'
+      ['-b'],
+      [['-c', '--longer']],
+      ['param', {
+        action: 'store', // set action for param see: https://github.com/nodeca/argparse#action-some-details
+        help: 'Sample param', // help will show up in usage and help outputs
+        message: 'Please provide param', // message will show up when falling back to inquirer (more to come)
+        required: true, // (default: false) Mark optional param as required
+        nargs: '*',
+        ...
+      }], // we can also apply configuration to each argument
+    ];
   }
 }
 ```
