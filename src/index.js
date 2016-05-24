@@ -153,11 +153,23 @@ function defineCommand(parentParser, cmdName, CmdCls) {
   if (typeof CmdCls === 'function') {
     command = new CmdCls();
     command.isCommand = true;
+    let params = null;
 
     if (typeof command.getArgs === 'function') {
-      const paramsIt = command.getArgs();
-      for (const param of paramsIt) {
-        cmdParser.addArgument(param[0], mapArgparse(param[0], param[1]));
+      params = command.getArgs();
+    } else if (Array.isArray(command.args)) {
+      params = command.args;
+    }
+
+    if (params) {
+      for (const param of params) {
+        const p = arrayify(param);
+        const cfg = (typeof p[p.length - 1] === 'object') ?
+          p.pop() : {};
+        const id = (Array.isArray(p[0])) ?
+          p[0] : p;
+
+        cmdParser.addArgument(id, mapArgparse(id, cfg));
       }
     }
   } else {
