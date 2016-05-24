@@ -114,9 +114,9 @@ function mapArgparse(id, cfg) {
 }
 
 function argsSelector(cfg) {
-  return new Promise((resolve) => {
+  return new Promise((resolveSelector) => {
     inquirer.prompt(cfg).then((answers) => {
-      resolve(answers);
+      resolveSelector(answers);
     });
   });
 }
