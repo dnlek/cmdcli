@@ -1,6 +1,14 @@
 import findParentDir from 'find-parent-dir';
 import fs from 'fs';
 
+export function isPositional(id) {
+  return (!id.some((item) => item.indexOf('-') === 0));
+}
+
+export function isRequired(id, cfg) {
+  return (cfg.required || isPositional(id));
+}
+
 export function arrayify(el) {
   return Array.isArray(el) ? el : [el];
 }

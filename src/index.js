@@ -1,7 +1,7 @@
 import 'babel-polyfill';
 import inquirer from 'inquirer';
 const ArgumentParser = require('argparse').ArgumentParser;
-import { getConfig, arrayify } from './utils';
+import { getConfig, arrayify, isPositional, isRequired } from './utils';
 import micromatch from 'micromatch';
 import findup from 'findup-sync';
 import path from 'path';
@@ -81,26 +81,22 @@ function mapInquirer(id, cfg, config) {
     ret = {
       ...ret,
       type: 'confirm',
-      message: cfg.message || `Confirm ${cfg.help}`,
+      message: cfg.message || `Confirm ${cfg.help || cfg.dest}`,
     };
   } else if (cfg.isPassword) {
     ret = {
       ...ret,
       type: 'password',
-      message: cfg.message || `Provide ${cfg.help}`,
+      message: cfg.message || `Provide ${cfg.help || cfg.dest}`,
     };
   } else {
     ret = {
       ...ret,
       type: 'input',
-      message: cfg.message || `Provide ${cfg.help}`,
+      message: cfg.message || `Provide ${cfg.help || cfg.dest}`,
     };
   }
   return ret;
-}
-
-function isRequired(id, cfg) {
-  return (cfg.required || !id.some((item) => item.indexOf('-') === 0));
 }
 
 function mapArgparse(id, cfg) {
@@ -123,11 +119,16 @@ function argsSelector(cfg) {
 
 
 function checkArgs(cmd, args, config) {
-  const argsIt = cmd.getArgs();
   const cfg = [];
-  for (const arg of argsIt) {
-    if (isRequired(arg) && !args[arg[0]]) {
-      cfg.push(mapInquirer(arg[0], arg[1], config));
+  for (const param of getCommandArgs(cmd)) {
+    if (isRequired(param.id, param.cfg)) {
+      const revealedParam = isPositional(param.id) ?
+        parser._getPositional(param.id, param.cfg) :
+        parser._getOptional(param.id, param.cfg);
+
+      if (args[revealedParam.dest] === null) {
+        cfg.push(mapInquirer(param.id, revealedParam, config));
+      }
     }
   }
 
@@ -147,30 +148,39 @@ function defineTopCommand(name, classes, parentParser) {
     { ...mem, [cmdName]: defineCommand(subparsers, cmdName, classes[cmdName]) }), {});
 }
 
+function *getCommandArgs(command) {
+  let params;
+  if (typeof command.getArgs === 'function') {
+    params = command.getArgs();
+  } else if (Array.isArray(command.args)) {
+    params = command.args;
+  }
+
+  if (params) {
+    for (const param of params) {
+      const p = arrayify(param);
+      const cfg = (typeof p[p.length - 1] === 'object') ?
+        p.pop() : {};
+      const id = (Array.isArray(p[0])) ?
+        p[0] : p;
+
+      yield {
+        id,
+        cfg: mapArgparse(id, cfg),
+      };
+    }
+  }
+}
+
 function defineCommand(parentParser, cmdName, CmdCls) {
   const cmdParser = parentParser.addParser(cmdName, { addHelp: true });
   let command;
   if (typeof CmdCls === 'function') {
     command = new CmdCls();
     command.isCommand = true;
-    let params = null;
 
-    if (typeof command.getArgs === 'function') {
-      params = command.getArgs();
-    } else if (Array.isArray(command.args)) {
-      params = command.args;
-    }
-
-    if (params) {
-      for (const param of params) {
-        const p = arrayify(param);
-        const cfg = (typeof p[p.length - 1] === 'object') ?
-          p.pop() : {};
-        const id = (Array.isArray(p[0])) ?
-          p[0] : p;
-
-        cmdParser.addArgument(id, mapArgparse(id, cfg));
-      }
+    for (const param of getCommandArgs(command)) {
+      cmdParser.addArgument(param.id, param.cfg);
     }
   } else {
     command = defineTopCommand(cmdName, CmdCls, cmdParser);
@@ -213,7 +223,7 @@ const config = Promise.all([
 
 let resolvedArgs = args;
 
-if (typeof command.getArgs === 'function') {
+if (typeof command.getArgs === 'function' || Array.isArray(command.args)) {
   resolvedArgs = config.then((cfg) => checkArgs(command, args, cfg));
 }
 
