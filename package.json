@@ -1,6 +1,6 @@
 {
   "name": "cmdcli",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Simple framework to build command line applications",
   "main": "lib/index.js",
   "keywords": [
