@@ -240,10 +240,16 @@ Promise.all([
   args = result[0];
   const cfg = result[1];
   Promise.resolve(command.exec(args, cfg))
-    .then((results) => {
+    .then(results => {
       if (typeof command.print === 'function') {
         command.print(results, args, cfg);
       }
     })
-    .catch(err => process.stderr.write(`Error while executing command: ${err}`));
+    .catch(err => {
+      if (typeof command.catch === 'function') {
+        command.catch(err, args, cfg);
+      } else {
+        process.stderr.write(`Error while executing command: ${err}\n`);
+      }
+    });
 });
