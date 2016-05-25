@@ -200,7 +200,7 @@ const parser = new ArgumentParser({
 parser.addArgument(['-g', '--global'], {
   action: 'storeTrue',
   help: 'Use globals only, ignore project configs',
-  default: false,
+  defaultValue: false,
 });
 
 const commands = { root: defineTopCommand('root', commandsClasses, parser) };
