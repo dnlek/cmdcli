@@ -103,8 +103,8 @@ function mapInquirer(id, cfg, config) {
 function mapArgparse(id, cfg) {
   const isArgRequired = isRequired(id, cfg);
   return {
-    ...(isArgRequired && { nargs: '?' }),
-    ...(isArgRequired && { action: 'store' }),
+    ...(isArgRequired || cfg.action === 'store' && { help: '(default: %(defaultValue)s)' }),
+    ...(isArgRequired && { nargs: '?', action: 'store' }),
     ...(!isArgRequired && { action: 'storeTrue' }),
     ...(cfg.isPassword && { action: 'store', const: EMPTY_PASSWORD, nargs: '?' }),
     ...cfg,
