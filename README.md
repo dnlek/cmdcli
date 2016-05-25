@@ -1,4 +1,4 @@
-# cmdcli - Simple framework to build command line applications
+# cmdcli
 
 Module which simplifies building of command line programs with multiple subcommands.
 Subcommands can be either stored in local module or referenced as external modules
