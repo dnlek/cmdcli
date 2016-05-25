@@ -1,5 +1,7 @@
 # cmdcli
 
+[![NPM version](https://img.shields.io/npm/v/cmdcli.svg)](https://www.npmjs.org/package/cmdcli)
+
 Module which simplifies building of command line programs with multiple subcommands.
 Subcommands can be either stored in local module or referenced as external modules
 
@@ -15,8 +17,10 @@ Subcommands can be either stored in local module or referenced as external modul
   process.title = '<APP_NAME>';
   require('../node_modules/cmdcli/lib/index');
 ```
-* Create `.cmdclirc` config file
+* Create `.cmdclirc.json` config file
 * Add bin entry in package.json
+
+or clone [cmdcli-example project](https://github.com/dnlek/cmdcli-example).
 
 ## Configuration:
 
