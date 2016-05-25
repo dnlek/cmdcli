@@ -1,6 +1,6 @@
 # cmdcli
 
-[![NPM version](https://img.shields.io/npm/v/argparse.svg)](https://www.npmjs.org/package/cmdcli)
+[![NPM version](https://img.shields.io/npm/v/cmdcli.svg)](https://www.npmjs.org/package/cmdcli)
 
 Module which simplifies building of command line programs with multiple subcommands.
 Subcommands can be either stored in local module or referenced as external modules
