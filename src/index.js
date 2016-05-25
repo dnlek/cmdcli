@@ -55,6 +55,7 @@ function mapInquirer(id, cfg, config) {
   let ret = {
     name: id[0],
     message: cfg.message || `Select ${cfg.help}`,
+    ...(cfg.typeFunction && { filter: cfg.typeFunction }),
   };
 
   if ((cfg.nargs === '*' || cfg.nargs === '+') && cfg.promptChoices) {
@@ -127,6 +128,8 @@ function checkArgs(cmd, args, config) {
         parser._getPositional(param.id, param.cfg) :
         parser._getOptional(param.id, param.cfg);
 
+      param.cfg.typeFunction = parser._registryGet('type', param.cfg.type, param.cfg.type);
+
       const val = args[revealedParam.dest];
       if (val === null || (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
         cfg.push(mapInquirer(param.id, revealedParam, config));
@@ -134,10 +137,11 @@ function checkArgs(cmd, args, config) {
     }
   }
 
-  return argsSelector(cfg).then((answers) => ({
-    ...args,
-    ...answers,
-  }));
+  return argsSelector(cfg)
+    .then(answers => ({
+      ...args,
+      ...answers,
+    }));
 }
 
 function defineTopCommand(name, classes, parentParser) {
