@@ -6,6 +6,7 @@
   "bin": {
     "cmdcli": "bin/cli"
   },
+  "repository": "dnlek/cmdcli",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
