@@ -62,7 +62,7 @@ export default class Command {
   }
 
   /**
-   * syncronous or asynchronous command execution function
+   * synchronous or asynchronous command execution function
    * args - Arguments parsed from command line - based on getArgs
    * cfg - Application configuration read from config files
    */
