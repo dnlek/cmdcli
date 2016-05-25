@@ -33,6 +33,7 @@ const BASE_CONFIG = configObject.baseConfig || {};
 const names = scope.reduce((result, prop) => (
   result.concat(Object.keys(configObject[prop] || {}))
 ), []);
+const EMPTY_PASSWORD = '__EMPTY__';
 
 let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
@@ -77,17 +78,17 @@ function mapInquirer(id, cfg, config) {
       choices: Array.isArray(cfg.promptChoices) ?
         cfg.promptChoices : cfg.promptChoices.bind(null, config),
     };
-  } else if (cfg.action === 'storeTrue') {
-    ret = {
-      ...ret,
-      type: 'confirm',
-      message: cfg.message || `Confirm ${cfg.help || cfg.dest}`,
-    };
   } else if (cfg.isPassword) {
     ret = {
       ...ret,
       type: 'password',
       message: cfg.message || `Provide ${cfg.help || cfg.dest}`,
+    };
+  } else if (cfg.action === 'storeTrue') {
+    ret = {
+      ...ret,
+      type: 'confirm',
+      message: cfg.message || `Confirm ${cfg.help || cfg.dest}`,
     };
   } else {
     ret = {
@@ -105,6 +106,7 @@ function mapArgparse(id, cfg) {
     ...(isArgRequired && { nargs: '?' }),
     ...(isArgRequired && { action: 'store' }),
     ...(!isArgRequired && { action: 'storeTrue' }),
+    ...(cfg.isPassword && { action: 'store', const: EMPTY_PASSWORD, nargs: '?' }),
     ...cfg,
   };
 }
@@ -117,16 +119,16 @@ function argsSelector(cfg) {
   });
 }
 
-
 function checkArgs(cmd, args, config) {
   const cfg = [];
   for (const param of getCommandArgs(cmd)) {
-    if (isRequired(param.id, param.cfg)) {
+    if (isRequired(param.id, param.cfg) || param.cfg.isPassword) {
       const revealedParam = isPositional(param.id) ?
         parser._getPositional(param.id, param.cfg) :
         parser._getOptional(param.id, param.cfg);
 
-      if (args[revealedParam.dest] === null) {
+      const val = args[revealedParam.dest];
+      if (val === null || (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
         cfg.push(mapInquirer(param.id, revealedParam, config));
       }
     }
