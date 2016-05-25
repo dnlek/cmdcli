@@ -1,11 +1,17 @@
 {
   "name": "cmdcli",
   "version": "0.0.11",
-  "description": "",
+  "description": "Simple framework to build command line applications",
   "main": "lib/index.js",
+  "keywords": [
+    "cli",
+    "argparse",
+    "commandline",
+  ],
   "bin": {
     "cmdcli": "bin/cli"
   },
+  "homepage": "https://github.com/dnlek/cmdcli",
   "repository": "dnlek/cmdcli",
   "scripts": {
     "compile": "babel -d lib/ src/",
