@@ -96,8 +96,9 @@ export default class Command {
         action: 'store', // set action for param see: https://github.com/nodeca/argparse#action-some-details
         help: 'Sample param', // help will show up in usage and help outputs
         message: 'Please provide param', // message will show up when falling back to inquirer (more to come)
-        required: true, // (default: false) Mark optional param as required
-        nargs: '*',
+        required: true, // (default: false) Mark optional param as required. Applies only to optional params.
+        nargs: '*', // how many times argument can be used.
+        isPassword: true, // whether given param is a password. Passwords are hidden with *** when given via prompt
         ...
       }], // we can also apply configuration to each argument
     ];
