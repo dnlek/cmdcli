@@ -56,16 +56,6 @@ export default class Command {
   }
 
   /**
-   * Optional print results function
-   * results - results passed from exec function
-   * args - Arguments parsed from command line - based on getArgs
-   * cfg - Application configuration read from config files
-   */
-  print(results, args, cfg) {
-    process.stdout.write("Print output from the exec command");
-  }
-
-  /**
    * synchronous or asynchronous command execution function
    * args - Arguments parsed from command line - based on getArgs
    * cfg - Application configuration read from config files
@@ -76,6 +66,28 @@ export default class Command {
       resolve();
     })
   }
+
+  /**
+   * Optional print results function
+   * results - results passed from exec function
+   * args - Arguments parsed from command line - based on getArgs
+   * cfg - Application configuration read from config files
+   */
+  print(results, args, cfg) {
+    process.stdout.write("Print output from the exec command");
+  }
+
+  /**
+   * Optional errors handling function
+   * err - Error message
+   * args - Arguments parsed from command line - based on getArgs
+   * cfg - Application configuration read from config files
+   */
+  catch(err, args, cfg) {
+    process.stdout.write("Handle execution errors");
+  }
+
+
 }
 ```
 
