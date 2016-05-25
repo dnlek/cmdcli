@@ -6,7 +6,7 @@
   "keywords": [
     "cli",
     "argparse",
-    "commandline",
+    "commandline"
   ],
   "bin": {
     "cmdcli": "bin/cli"
