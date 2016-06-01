@@ -5,5 +5,6 @@ lib/
 .data.json
 .aem
 .aemproject
+.idea/
 
 npm-debug.log
