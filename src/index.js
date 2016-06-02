@@ -7,10 +7,14 @@ import findup from 'findup-sync';
 import path from 'path';
 import resolve from 'resolve';
 import os from 'os';
+import winston from 'winston';
 
 const parentDir = path.dirname(module.parent.filename);
+winston.debug(`CONFIG: parentDir = ${parentDir}`);
 const packageFile = findup('package.json', { cwd: parentDir });
+winston.debug(`CONFIG: packageFile = ${packageFile}`);
 const configFile = findup('.cmdclirc.json', { cwd: parentDir });
+winston.debug(`CONFIG: configFile = ${configFile}`);
 const requireFn = (name) => {
   // This searches up from the specified package.json file, making sure
   // the config option behaves as expected. See issue #56.
@@ -45,9 +49,10 @@ LOCAL_FOLDERS.forEach((name) => {
 
 micromatch(names, pattern).forEach((name) => {
   try {
+    winston.debug(`Load command class: ${name}`);
     commandsClasses[name.split('-').pop()] = requireFn(name);
   } catch (e) {
-    console.log('error', e);
+    winston.error(`Error while loading command class: ${name}`);
   }
 });
 
@@ -132,7 +137,9 @@ function checkArgs(cmd, args, config) {
 
       const val = args[revealedParam.dest];
       if (val === null || (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
-        cfg.push(mapInquirer(param.id, revealedParam, config));
+        const promptConfig = mapInquirer(param.id, revealedParam, config);
+        winston.debug(`map inquirer: ${param.id} -> `, promptConfig);
+        cfg.push(promptConfig);
       }
     }
   }
