@@ -55,6 +55,10 @@ export default class Command {
     ];
   }
 
+  get aliases() {
+    return ['co'];
+  }
+
   /**
    * synchronous or asynchronous command execution function
    * args - Arguments parsed from command line - based on getArgs
