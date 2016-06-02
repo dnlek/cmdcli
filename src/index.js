@@ -150,8 +150,15 @@ function defineTopCommand(name, classes, parentParser) {
     dest: name,
   });
 
-  return Object.keys(classes).reduce((mem, cmdName) => (
-    { ...mem, [cmdName]: defineCommand(subparsers, cmdName, classes[cmdName]) }), {});
+  return Object.keys(classes).reduce(
+    (mem, cmdName) => {
+      const cmd = defineCommand(subparsers, cmdName, classes[cmdName]);
+      arrayify([cmdName, ...(cmd.aliases || [])]).forEach(alias => (mem[alias] = cmd));
+
+      return mem;
+    },
+    {}
+  );
 }
 
 function *getCommandArgs(command) {
@@ -179,16 +186,24 @@ function *getCommandArgs(command) {
 }
 
 function defineCommand(parentParser, cmdName, CmdCls) {
-  const cmdParser = parentParser.addParser(cmdName, { addHelp: true });
   let command;
+  const cmdParserCfg = { help: true };
+
   if (typeof CmdCls === 'function') {
     command = new CmdCls();
     command.isCommand = true;
+
+    if (typeof command.aliases !== 'undefined') {
+      cmdParserCfg.aliases = arrayify(command.aliases);
+    }
+
+    const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
 
     for (const param of getCommandArgs(command)) {
       cmdParser.addArgument(param.id, param.cfg);
     }
   } else {
+    const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
     command = defineTopCommand(cmdName, CmdCls, cmdParser);
   }
 
