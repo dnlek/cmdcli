@@ -112,7 +112,7 @@ function mapArgparse(id, cfg) {
     ...(isArgRequired || cfg.action === 'store' && { help: '(default: %(defaultValue)s)' }),
     ...(isArgRequired && { nargs: '?', action: 'store' }),
     ...(!isArgRequired && { action: 'storeTrue' }),
-    ...(cfg.isPassword && { action: 'store', const: EMPTY_PASSWORD, nargs: '?' }),
+    ...(cfg.isPassword && { action: 'store', nargs: '?', constant: EMPTY_PASSWORD }),
     ...cfg,
   };
 }
@@ -134,9 +134,10 @@ function checkArgs(cmd, args, config) {
         parser._getOptional(param.id, param.cfg);
 
       param.cfg.typeFunction = parser._registryGet('type', param.cfg.type, param.cfg.type);
+      let val = args[revealedParam.dest];
 
-      const val = args[revealedParam.dest];
-      if (val === null || (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
+      if ((val === null && !param.cfg.isPassword) ||
+          (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
         const promptConfig = mapInquirer(param.id, revealedParam, config);
         winston.debug(`map inquirer: ${param.id} -> `, promptConfig);
         cfg.push(promptConfig);
