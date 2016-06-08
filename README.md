@@ -23,6 +23,17 @@ npm install -g yo generator-cmdcli
 yo cmdcli
 ```
 
+### Self setup command
+
+This method runs yeoman generator internally to bootstrap cmdcli enabled application.
+
+```bash
+mkdir <APP_FOLDER>
+cd <APP_FOLDER>
+npm install -g cmdcli
+cmdcli setup
+```
+
 ### Copy sample project
 Clone [cmdcli-example project](https://github.com/dnlek/cmdcli-example)
 
