@@ -15,20 +15,33 @@ cmdcli by default supports:
 
 ## How to use
 
+### Yeoman installation
+```bash
+mkdir <APP_FOLDER>
+cd <APP_FOLDER>
+npm install -g yo generator-cmdcli
+yo cmdcli
+```
+
+### Copy sample project
+Clone [cmdcli-example project](https://github.com/dnlek/cmdcli-example)
+
+### Manual installation
 * Create new npm module and add cmdcli as dependency.
 ```bash
-  npm i -S cmdcli
+mkdir <APP_FOLDER>
+cd <APP_FOLDER>
+npm init
+npm install -S cmdcli
 ```
 * Create `bin/<app_name>` file with the following contents:
 ```bash
-  #!/usr/bin/env node
-  process.title = '<APP_NAME>';
-  require('../node_modules/cmdcli/lib/index');
+#!/usr/bin/env node
+require('../node_modules/cmdcli/lib/index');
 ```
 * Create `.cmdclirc.json` config file
 * Add bin entry in package.json
 
-or clone [cmdcli-example project](https://github.com/dnlek/cmdcli-example).
 
 ## Configuration
 
