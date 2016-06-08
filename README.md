@@ -121,3 +121,19 @@ export default class Command {
   }
 }
 ```
+
+## Completions
+
+Completions are handled automatically in bash/zsh and fish environments using [node-tabtab](https://github.com/mklabs/node-tabtab) project.
+To activate completion for your program you need to install tabtab script first.
+The easiest way to do this is to add following install script to your program:
+```json
+{
+  "scripts": {
+    "install": "tabtab install"
+  }
+}
+```
+For more info take a look at [tabtab module documentation](https://github.com/mklabs/node-tabtab).
+
+By default completion will be handled for subcommands, optional arguments names and positional arguments with promptChoices parameter defined.
