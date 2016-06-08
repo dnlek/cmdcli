@@ -11,6 +11,11 @@ while (parentPackage != null && parentPackage.filename.indexOf('/cmdcli/lib/') !
   parentPackage = parentPackage.parent;
 }
 
+// Handle local commands too
+if (parentPackage === null) {
+  parentPackage = module.parent;
+}
+
 const parentDir = path.dirname(parentPackage.filename);
 winston.debug(`CONFIG: parentDir = ${parentDir}`);
 const packageFile = findup('package.json', { cwd: parentDir });
