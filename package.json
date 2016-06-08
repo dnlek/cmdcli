@@ -16,7 +16,7 @@
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run compile"
   },
   "author": "Daniel Wagner <dnl.wagner@gmail.com>",
   "license": "MIT",
