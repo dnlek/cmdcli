@@ -3,7 +3,15 @@
 [![NPM version](https://img.shields.io/npm/v/cmdcli.svg)](https://www.npmjs.org/package/cmdcli)
 
 Module which simplifies building of command line programs with multiple subcommands.
-Subcommands can be either stored in local module or referenced as external modules
+cmdcli by default supports:
+ * arguments parsing
+ * multiple subcommands with aliases
+ * arguments completion (zsh/bash/fish)
+ * arguments prompt
+ * loading local and external subcommands
+ * asynchronous commands
+ * application global and local config
+ * easy integration using simple config file
 
 ## How to use
 
@@ -22,7 +30,7 @@ Subcommands can be either stored in local module or referenced as external modul
 
 or clone [cmdcli-example project](https://github.com/dnlek/cmdcli-example).
 
-## Configuration:
+## Configuration
 
 commandsPattern (default: `['cmdcli-*', 'cmd-cli-*']`)  
 Pattern used to find subcommands in project dependencies. All packages which will match the pattern will be included as subcommands.
@@ -39,7 +47,7 @@ What is the name of application config file. By default library will locate this
 baseConfig (default: `{}`)  
 Base config object which will be overwritten by config files.
 
-## Commands:
+## Commands
 
 Sample command could look like this:
 ```javascript
