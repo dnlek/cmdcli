@@ -55,6 +55,9 @@ export default class Command {
     ];
   }
 
+  /**
+   * Pass command alias/aliases
+   */
   get aliases() {
     return ['co'];
   }
@@ -65,7 +68,6 @@ export default class Command {
    * cfg - Application configuration read from config files
    */
   exec(args, cfg) {
-
     return new Promise((resolve) => {
       resolve();
     })
@@ -115,6 +117,7 @@ export default class Command {
         required: true, // (default: false) Mark optional param as required. Applies only to optional params.
         nargs: '*', // how many times argument can be used.
         isPassword: true, // whether given param is a password. Passwords are hidden with *** when given via prompt
+        promptChoices: ['one', 'two'], // (array|fn) When no value is given to the positional argument prompt will be shown with available list of values
         ...
       }], // we can also apply configuration to each argument
     ];
