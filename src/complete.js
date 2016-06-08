@@ -29,7 +29,7 @@ export default function complete(binEntryPoint, commands, parser) {
       let params = [];
       const args = parser.parseKnownArgs(items);
       const config = loadConfig(args.global, BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE);
-
+      let firstPositional = true;
       for (const param of getCommandArgs(cmd)) {
         const isPosition = isPositional(param.id);
         const revealedParam = isPosition ?
@@ -43,10 +43,17 @@ export default function complete(binEntryPoint, commands, parser) {
 
         // positional + value null + promptChoices
         // TODO handle only current positional
+        // XXX for now we are handling only first null positional
         if (isPosition &&
             (typeof val === 'undefined' || val === null) &&
-            revealedParam.promptChoices) {
-          params = [...params, ...revealedParam.promptChoices.call(null, config)];
+            revealedParam.promptChoices &&
+            firstPositional) {
+          if (typeof revealedParam.promptChoices === 'function') {
+            params = [...params, ...revealedParam.promptChoices.call(null, config)];
+          } else if (Array.isArray(revealedParam.promptChoices)) {
+            params = [...params, ...revealedParam.promptChoices];
+          }
+          firstPositional = false;
         }
 
         // optional + action: store + before current position
