@@ -1,5 +1,2 @@
 #!/usr/bin/env node
-
-process.title = 'CmdCli';
-
 require('../lib/index');
