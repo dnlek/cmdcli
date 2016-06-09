@@ -171,6 +171,11 @@ For more info take a look at [tabtab module documentation](https://github.com/mk
 
 By default completion will be handled for subcommands, optional arguments names and positional arguments with promptChoices parameter defined.
 
+## License
+
+MIT © [Daniel Wagner &lt;dnl.wagner@gmail.com&gt;]()
+
+
 [npm-image]: https://badge.fury.io/js/cmdcli.svg
 [npm-url]: https://npmjs.org/package/cmdcli
 [travis-image]: https://travis-ci.org/dnlek/cmdcli.svg?branch=master
