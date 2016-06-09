@@ -4,10 +4,9 @@ const ArgumentParser = require('argparse').ArgumentParser;
 import { arrayify, isPositional, isRequired,
         getCommandArgs, loadConfig } from './utils';
 import micromatch from 'micromatch';
-import winston from 'winston';
 import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
-        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE } from './config';
+        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, logger, debuglog } from './config';
 import complete from './complete';
 
 let commandsClasses;
@@ -20,10 +19,11 @@ LOCAL_FOLDERS.forEach((name) => {
 
 micromatch(names, pattern).forEach((name) => {
   try {
-    winston.debug(`Load command class: ${name}`);
+    debuglog(`Load command class: ${name}`);
     commandsClasses[name.split('-').pop()] = requireFn(name);
   } catch (e) {
-    winston.error(`Error while loading command class: ${name}`);
+    process.stderr.write(`Error while loading command class: ${name}\n`);
+    process.exit(2);
   }
 });
 
@@ -94,12 +94,11 @@ function checkArgs(cmd, args, config) {
         parser._getOptional(param.id, param.cfg);
 
       param.cfg.typeFunction = parser._registryGet('type', param.cfg.type, param.cfg.type);
-      let val = args[revealedParam.dest];
+      const val = args[revealedParam.dest];
 
       if ((val === null && !param.cfg.isPassword) ||
           (param.cfg.isPassword && val === c.EMPTY_PASSWORD)) {
         const promptConfig = mapInquirer(param.id, revealedParam, config);
-        winston.debug(`map inquirer: ${param.id} -> `, promptConfig);
         cfg.push(promptConfig);
       }
     }
@@ -174,10 +173,27 @@ parser.addArgument(['--verbose', '-v'], {
   action: 'count',
 });
 
+parser.addArgument(['--silent'], {
+  action: 'storeTrue',
+});
+
 const commands = { root: defineTopCommand('root', commandsClasses, parser) };
 
 if (!complete(binEntryPoint, commands, parser)) {
   let args = parser.parseArgs();
+
+  if (args.verbose > 0) {
+    logger.level = c.LOG_LEVELS[
+      Math.min(c.LOG_LEVELS.length - 1,
+      c.DEFAULT_LOG_LEVEL + args.verbose)];
+  } else {
+    logger.level = c.LOG_LEVELS[c.DEFAULT_LOG_LEVEL];
+  }
+
+  if (args.silent) {
+    logger.level = -1;
+  }
+
   const cmdPath = ['root'];
   let i = 'root';
   let command = commands[i];
@@ -217,3 +233,7 @@ if (!complete(binEntryPoint, commands, parser)) {
       });
   });
 }
+
+export {
+  logger,
+};
