@@ -214,7 +214,7 @@ $ NODE_DEBUG=cmdcli program cmd
 CMDCLI 1996: CONFIG: parentDir = ...
 CMDCLI 1996: CONFIG: packageFile = .../package.json
 CMDCLI 1996: CONFIG: configFile = .../.cmdclirc.json
-usage: aem [-h] [-g] [--version] [--verbose] [--silent]
+usage: program [-h] [-g] [--version] [--verbose] [--silent]
 
            {cmd}
            ...
