@@ -1,4 +1,4 @@
-# cmdcli [![NPM version][npm-image]][npm-url]
+# cmdcli [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 
 Module which simplifies building of command line programs with multiple subcommands.
 cmdcli by default supports:
@@ -170,3 +170,10 @@ The easiest way to do this is to add following install script to your program:
 For more info take a look at [tabtab module documentation](https://github.com/mklabs/node-tabtab).
 
 By default completion will be handled for subcommands, optional arguments names and positional arguments with promptChoices parameter defined.
+
+[npm-image]: https://badge.fury.io/js/cmdcli.svg
+[npm-url]: https://npmjs.org/package/cmdcli
+[travis-image]: https://travis-ci.org/dnlek/cmdcli.svg?branch=master
+[travis-url]: https://travis-ci.org/dnlek/cmdcli
+[daviddm-image]: https://david-dm.org/dnlek/cmdcli.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/dnlek/cmdcli
