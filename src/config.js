@@ -5,6 +5,18 @@ import { arrayify } from './utils';
 import * as c from './const';
 import os from 'os';
 import resolve from 'resolve';
+import util from 'util';
+
+export const logger = new winston.Logger({
+  transports: [
+    new winston.transports.Console({
+      handleExceptions: true,
+    }),
+  ],
+  exitOnError: false,
+});
+
+export const debuglog = util.debuglog('cmdcli');
 
 // Iterate module parents to find parent npm package
 let parentPackage = module.parent;
@@ -18,11 +30,11 @@ if (parentPackage === null) {
 }
 
 const parentDir = path.dirname(parentPackage.filename);
-winston.debug(`CONFIG: parentDir = ${parentDir}`);
+debuglog(`CONFIG: parentDir = ${parentDir}`);
 const packageFile = findup('package.json', { cwd: parentDir });
-winston.debug(`CONFIG: packageFile = ${packageFile}`);
+debuglog(`CONFIG: packageFile = ${packageFile}`);
 const configFile = findup('.cmdclirc.json', { cwd: parentDir });
-winston.debug(`CONFIG: configFile = ${configFile}`);
+debuglog(`CONFIG: configFile = ${configFile}`);
 
 export const requireFn = (name) => {
   // This searches up from the specified package.json file, making sure
