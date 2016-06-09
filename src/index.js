@@ -155,7 +155,6 @@ function defineCommand(parentParser, cmdName, CmdCls) {
 }
 
 const parser = new ArgumentParser({
-  version: configObject.version,
   addHelp: true,
   description: `${configObject.name} // ${configObject.description}`,
 });
@@ -164,6 +163,15 @@ parser.addArgument(['-g', '--global'], {
   action: 'storeTrue',
   help: 'Use globals only, ignore project configs',
   defaultValue: false,
+});
+
+parser.addArgument(['--version'], {
+  action: 'version',
+  version: `%(prog)s ${configObject.version}`,
+});
+
+parser.addArgument(['--verbose', '-v'], {
+  action: 'count',
 });
 
 const commands = { root: defineTopCommand('root', commandsClasses, parser) };
