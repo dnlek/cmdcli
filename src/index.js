@@ -131,7 +131,7 @@ function defineTopCommand(name, classes, parentParser) {
 
 function defineCommand(parentParser, cmdName, CmdCls) {
   let command;
-  const cmdParserCfg = { help: true };
+  const cmdParserCfg = { addHelp: true };
 
   if (typeof CmdCls === 'function') {
     command = new CmdCls();
