@@ -5,7 +5,7 @@ import { arrayify, isPositional, isRequired,
         getCommandArgs, loadConfig } from './utils';
 import micromatch from 'micromatch';
 import winston from 'winston';
-import { EMPTY_PASSWORD } from './const';
+import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE } from './config';
 import complete from './complete';
@@ -97,7 +97,7 @@ function checkArgs(cmd, args, config) {
       let val = args[revealedParam.dest];
 
       if ((val === null && !param.cfg.isPassword) ||
-          (param.cfg.isPassword && val === EMPTY_PASSWORD)) {
+          (param.cfg.isPassword && val === c.EMPTY_PASSWORD)) {
         const promptConfig = mapInquirer(param.id, revealedParam, config);
         winston.debug(`map inquirer: ${param.id} -> `, promptConfig);
         cfg.push(promptConfig);

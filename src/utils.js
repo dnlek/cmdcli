@@ -1,6 +1,6 @@
 import findParentDir from 'find-parent-dir';
 import fs from 'fs';
-import { EMPTY_PASSWORD } from './const';
+import * as c from './const';
 import path from 'path';
 
 export function isPositional(id) {
@@ -21,7 +21,7 @@ function mapArgparse(id, cfg) {
     ...(isArgRequired || cfg.action === 'store' && { help: '(default: %(defaultValue)s)' }),
     ...(isArgRequired && { nargs: '?', action: 'store' }),
     ...(!isArgRequired && { action: 'storeTrue' }),
-    ...(cfg.isPassword && { action: 'store', nargs: '?', constant: EMPTY_PASSWORD }),
+    ...(cfg.isPassword && { action: 'store', nargs: '?', constant: c.EMPTY_PASSWORD }),
     ...cfg,
   };
 }
