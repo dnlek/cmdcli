@@ -155,6 +155,72 @@ export default class Command {
 }
 ```
 
+## Logging
+
+By default each cmdcli program comes with --verbose param which indicates log level. Each occurrence of -v or --verbose param rises log level up to 'silly'.
+By default log level is set to info but it can be silented using --silent param.
+Winston logging library stores error and debug logs on stderr while all others are sent to stdout.
+
+```javascript
+import { logger } from 'cmdcli';
+
+export default class Command {
+  exec(args, config) {
+    logger.error("TEST!!!!!");
+    logger.warn("TEST!!!!!");
+    logger.info("TEST!!!!!");
+    logger.verbose("TEST!!!!!");
+    logger.debug("TEST!!!!!");
+    logger.silly("TEST!!!!!");
+  }
+}
+```
+
+```bash
+$ program cmd
+error: TEST!!!!!
+warn: TEST!!!!!
+info: TEST!!!!!
+
+$ program -v cmd
+error: TEST!!!!!
+warn: TEST!!!!!
+info: TEST!!!!!
+verbose: TEST!!!!!
+
+$ program -vv cmd
+error: TEST!!!!!
+warn: TEST!!!!!
+info: TEST!!!!!
+verbose: TEST!!!!!
+debug: TEST!!!!!
+
+$ program -vvv cmd
+error: TEST!!!!!
+warn: TEST!!!!!
+info: TEST!!!!!
+verbose: TEST!!!!!
+debug: TEST!!!!!
+silly: TEST!!!!!
+
+$ program --silent cmd
+
+```
+
+Internal cmdcli logs can be seen using NODE_DEBUG=cmdcli.
+
+```bash
+$ NODE_DEBUG=cmdcli program cmd
+CMDCLI 1996: CONFIG: parentDir = ...
+CMDCLI 1996: CONFIG: packageFile = .../package.json
+CMDCLI 1996: CONFIG: configFile = .../.cmdclirc.json
+usage: aem [-h] [-g] [--version] [--verbose] [--silent]
+
+           {cmd}
+           ...
+program: error: too few arguments
+```
+
 ## Completions
 
 Completions are handled automatically in bash/zsh and fish environments using [node-tabtab](https://github.com/mklabs/node-tabtab) project.
