@@ -1,6 +1,4 @@
-# cmdcli
-
-[![NPM version](https://img.shields.io/npm/v/cmdcli.svg)](https://www.npmjs.org/package/cmdcli)
+# cmdcli [![NPM version][npm-image]][npm-url]
 
 Module which simplifies building of command line programs with multiple subcommands.
 cmdcli by default supports:
