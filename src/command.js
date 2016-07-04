@@ -46,7 +46,9 @@ function defineCommand(parentParser, cmdName, CmdCls) {
   command.isCommand = true;
 
   if (typeof command.aliases !== 'undefined') {
-    cmdParserCfg.aliases = arrayify(command.aliases);
+    cmdParserCfg.aliases = arrayify(command.aliases).map((alias) => (
+      (Array.isArray(alias)) ? alias[0] : alias
+    ));
   }
 
   const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
@@ -56,6 +58,19 @@ function defineCommand(parentParser, cmdName, CmdCls) {
   }
 
   return command;
+}
+
+function mapAliases(cmd) {
+  return (mem, a) => {
+    const alias = arrayify(a);
+    return {
+      ...mem,
+      [alias[0]]: {
+        cmd,
+        args: alias[1],
+      },
+    };
+  };
 }
 
 export function defineNamespace(name, classes, parentParser) {
@@ -76,8 +91,7 @@ export function defineNamespace(name, classes, parentParser) {
         cmd = defineNamespace(cmdName, CmdCls, cmdParser);
       }
 
-      const cmdAliases = arrayify([cmdName, ...(cmd.aliases || [])]);
-      return cmdAliases.reduce((aliasMem, alias) => ({ ...aliasMem, [alias]: cmd }), mem);
+      return arrayify([cmdName, ...(cmd.aliases || [])]).reduce(mapAliases(cmd), mem);
     },
     {}
   );
@@ -112,15 +126,16 @@ function checkArgs(parser, cmd, args, config) {
 export function getCurrentCommand(commands, args) {
   let i = 'root';
   let command = commands[i];
-  while (!command.isCommand) {
+  while (command && !command.cmd) {
     i = args[i];
     command = command[i];
   }
   return command;
 }
 
-export function execute(command, config, cmdArgs, parser) {
+export function execute(cmd, config, cmdArgs, parser) {
   let args = cmdArgs;
+  const command = cmd.cmd;
 
   if (typeof command.getArgs === 'function' || Array.isArray(command.args)) {
     args = config.then((cfg) => checkArgs(parser, command, args, cfg));
@@ -130,7 +145,7 @@ export function execute(command, config, cmdArgs, parser) {
     Promise.resolve(args),
     config,
   ]).then((result) => {
-    args = result[0];
+    args = { ...result[0], ...cmd.args };
     const cfg = result[1];
 
     // Execute exec function
