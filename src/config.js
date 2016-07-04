@@ -20,12 +20,13 @@ const parentDir = path.dirname(parentPackage.filename);
 debuglog(`CONFIG: parentDir = ${parentDir}`);
 export const packageFile = findup('package.json', { cwd: parentDir });
 debuglog(`CONFIG: packageFile = ${packageFile}`);
+export const packageDir = path.dirname(packageFile);
 const configFile = findup('.cmdclirc.json', { cwd: parentDir });
 debuglog(`CONFIG: configFile = ${configFile}`);
 
 export const configObject = {
-  ...requireFn(packageFile, packageFile),
-  ...requireFn(configFile, packageFile),
+  ...requireFn(packageFile, packageDir),
+  ...requireFn(configFile, packageDir),
 };
 
 export const binEntryPoint = configObject.bin && Object.keys(configObject.bin).length ?
