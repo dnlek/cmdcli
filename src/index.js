@@ -9,6 +9,8 @@ import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, logger, debuglog } from './config';
 import complete from './complete';
 
+const BASE_PARSER_CFG = { addHelp: true };
+
 let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
   commandsClasses = {
@@ -111,6 +113,25 @@ function checkArgs(cmd, args, config) {
     }));
 }
 
+function defineCommand(parentParser, cmdName, CmdCls) {
+  const cmdParserCfg = { ...BASE_PARSER_CFG };
+  const command = new CmdCls();
+  command.isCommand = true;
+
+  if (typeof command.aliases !== 'undefined') {
+    cmdParserCfg.aliases = arrayify(command.aliases);
+  }
+
+  const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
+
+  for (const param of getCommandArgs(command)) {
+    cmdParser.addArgument(param.id, param.cfg);
+  }
+
+  return command;
+}
+
+
 function defineTopCommand(name, classes, parentParser) {
   const subparsers = parentParser.addSubparsers({
     title: '',
@@ -119,38 +140,22 @@ function defineTopCommand(name, classes, parentParser) {
 
   return Object.keys(classes).reduce(
     (mem, cmdName) => {
-      const cmd = defineCommand(subparsers, cmdName, classes[cmdName]);
+      const CmdCls = classes[cmdName];
+      let cmd;
+      if (typeof CmdCls === 'function') {
+        cmd = defineCommand(subparsers, cmdName, CmdCls);
+      } else {
+        const cmdParserCfg = { ...BASE_PARSER_CFG };
+        const cmdParser = subparsers.addParser(cmdName, cmdParserCfg);
+        cmd = defineTopCommand(cmdName, CmdCls, cmdParser);
+      }
+
       arrayify([cmdName, ...(cmd.aliases || [])]).forEach(alias => (mem[alias] = cmd));
 
       return mem;
     },
     {}
   );
-}
-
-function defineCommand(parentParser, cmdName, CmdCls) {
-  let command;
-  const cmdParserCfg = { addHelp: true };
-
-  if (typeof CmdCls === 'function') {
-    command = new CmdCls();
-    command.isCommand = true;
-
-    if (typeof command.aliases !== 'undefined') {
-      cmdParserCfg.aliases = arrayify(command.aliases);
-    }
-
-    const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
-
-    for (const param of getCommandArgs(command)) {
-      cmdParser.addArgument(param.id, param.cfg);
-    }
-  } else {
-    const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
-    command = defineTopCommand(cmdName, CmdCls, cmdParser);
-  }
-
-  return command;
 }
 
 const parser = new ArgumentParser({
