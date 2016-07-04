@@ -1,5 +1,4 @@
 import 'babel-polyfill';
-import inquirer from 'inquirer';
 const ArgumentParser = require('argparse').ArgumentParser;
 import { arrayify, isPositional, isRequired,
         getCommandArgs, loadConfig } from './utils';
@@ -8,6 +7,7 @@ import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, logger, debuglog } from './config';
 import complete from './complete';
+import * as prompt from './prompt';
 
 const BASE_PARSER_CFG = { addHelp: true };
 
@@ -29,64 +29,6 @@ micromatch(names, pattern).forEach((name) => {
   }
 });
 
-function mapInquirer(id, cfg, config) {
-  let ret = {
-    name: id[0],
-    message: cfg.message || `Select ${cfg.help}`,
-    ...(cfg.typeFunction && { filter: cfg.typeFunction }),
-  };
-
-  if ((cfg.nargs === '*' || cfg.nargs === '+') && cfg.promptChoices) {
-    ret = {
-      ...ret,
-      type: 'checkbox',
-      choices: Array.isArray(cfg.promptChoices) ?
-        cfg.promptChoices : cfg.promptChoices.bind(null, config),
-    };
-  } if (cfg.promptRaw && cfg.promptChoices) {
-    ret = {
-      ...ret,
-      type: 'rawList',
-      choices: Array.isArray(cfg.promptChoices) ?
-        cfg.promptChoices : cfg.promptChoices.bind(null, config),
-    };
-  } else if (cfg.promptChoices) {
-    ret = {
-      ...ret,
-      type: 'list',
-      choices: Array.isArray(cfg.promptChoices) ?
-        cfg.promptChoices : cfg.promptChoices.bind(null, config),
-    };
-  } else if (cfg.isPassword) {
-    ret = {
-      ...ret,
-      type: 'password',
-      message: cfg.message || `Provide ${cfg.help || cfg.dest}`,
-    };
-  } else if (cfg.action === 'storeTrue') {
-    ret = {
-      ...ret,
-      type: 'confirm',
-      message: cfg.message || `Confirm ${cfg.help || cfg.dest}`,
-    };
-  } else {
-    ret = {
-      ...ret,
-      type: 'input',
-      message: cfg.message || `Provide ${cfg.help || cfg.dest}`,
-    };
-  }
-  return ret;
-}
-
-function argsSelector(cfg) {
-  return new Promise((resolveSelector) => {
-    inquirer.prompt(cfg).then((answers) => {
-      resolveSelector(answers);
-    });
-  });
-}
-
 function checkArgs(cmd, args, config) {
   const cfg = [];
   for (const param of getCommandArgs(cmd)) {
@@ -100,13 +42,13 @@ function checkArgs(cmd, args, config) {
 
       if ((val === null && !param.cfg.isPassword) ||
           (param.cfg.isPassword && val === c.EMPTY_PASSWORD)) {
-        const promptConfig = mapInquirer(param.id, revealedParam, config);
+        const promptConfig = prompt.mapArgs(param.id, revealedParam, config);
         cfg.push(promptConfig);
       }
     }
   }
 
-  return argsSelector(cfg)
+  return prompt.argsSelector(cfg)
     .then(answers => ({
       ...args,
       ...answers,
