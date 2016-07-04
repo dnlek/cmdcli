@@ -134,11 +134,11 @@ export function getCurrentCommand(commands, args) {
 }
 
 export function execute(cmd, config, cmdArgs, parser) {
-  let args = cmdArgs;
+  let args;
   const command = cmd.cmd;
 
   if (typeof command.getArgs === 'function' || Array.isArray(command.args)) {
-    args = config.then((cfg) => checkArgs(parser, command, args, cfg));
+    args = config.then((cfg) => checkArgs(parser, command, cmdArgs, cfg));
   }
 
   Promise.all([
