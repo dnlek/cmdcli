@@ -74,8 +74,8 @@ export function defineNamespace(name, classes, parentParser) {
         cmd = defineNamespace(cmdName, CmdCls, cmdParser);
       }
 
-      return arrayify([cmdName, ...(cmd.aliases || [])])
-        .reduce((aliasMem, alias) => ({ ...aliasMem, [alias]: cmd }), mem);
+      const cmdAliases = arrayify([cmdName, ...(cmd.aliases || [])]);
+      return cmdAliases.reduce((aliasMem, alias) => ({ ...aliasMem, [alias]: cmd }), mem);
     },
     {}
   );
