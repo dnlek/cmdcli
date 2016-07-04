@@ -57,7 +57,6 @@ function defineCommand(parentParser, cmdName, CmdCls) {
 }
 
 export function defineNamespace(name, classes, parentParser) {
-  console.log('defineNamespace', name, typeof parentParser);
   const subparsers = parentParser.addSubparsers({
     title: '',
     dest: name,
@@ -65,7 +64,6 @@ export function defineNamespace(name, classes, parentParser) {
 
   return Object.keys(classes).reduce(
     (mem, cmdName) => {
-      console.log('def command', cmdName);
       const CmdCls = classes[cmdName];
       let cmd;
       if (typeof CmdCls === 'function') {
