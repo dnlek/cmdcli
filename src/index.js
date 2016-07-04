@@ -8,7 +8,7 @@ import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
 import { logger, debuglog } from './logs';
 import complete from './complete';
 import * as prompt from './prompt';
-import { defineNamespace, getCommandArgs } from './commands';
+import { defineNamespace, getCommandArgs } from './command';
 
 let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
