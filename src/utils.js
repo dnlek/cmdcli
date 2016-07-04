@@ -2,6 +2,8 @@ import findParentDir from 'find-parent-dir';
 import fs from 'fs';
 import path from 'path';
 import resolve from 'resolve';
+import micromatch from 'micromatch';
+import { debuglog } from './logs';
 
 export function isPositional(id) {
   return (!id.some((item) => item.indexOf('-') === 0));
@@ -20,6 +22,28 @@ export function requireFn(name, packageFile) {
   // the config option behaves as expected. See issue #56.
   const src = resolve.sync(name, { basedir: path.dirname(packageFile) });
   return require(src);
+}
+
+export function getLocalCommands(folders, packageFile) {
+  return folders.reduce((mem, name) => ({
+    ...mem,
+    ...requireFn(name, packageFile),
+  }), {});
+}
+
+export function getSubpackagesCommands(subpackages, pattern, packageFile) {
+  return micromatch(subpackages, pattern).reduce((mem, name) => {
+    try {
+      debuglog(`Load command class: ${name}`);
+      return {
+        ...mem,
+        [name.split('-').pop()]: requireFn(name, packageFile),
+      };
+    } catch (e) {
+      process.stderr.write(`Error while loading command class: ${name}\n`);
+      process.exit(2);
+    }
+  }, {});
 }
 
 export function getConfig(file, startDir) {

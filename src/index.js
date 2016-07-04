@@ -1,32 +1,19 @@
 import 'babel-polyfill';
 const ArgumentParser = require('argparse').ArgumentParser;
-import { isPositional, isRequired, loadConfig, requireFn } from './utils';
-import micromatch from 'micromatch';
+import { isPositional, isRequired, loadConfig,
+        getLocalCommands, getSubpackagesCommands } from './utils';
 import * as c from './const';
-import { names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
+import { subpackages, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, packageFile } from './config';
-import { logger, debuglog } from './logs';
+import { logger } from './logs';
 import complete from './complete';
 import * as prompt from './prompt';
 import { defineNamespace, getCommandArgs } from './command';
 
-let commandsClasses;
-LOCAL_FOLDERS.forEach((name) => {
-  commandsClasses = {
-    ...commandsClasses,
-    ...requireFn(name, packageFile),
-  };
-});
-
-micromatch(names, pattern).forEach((name) => {
-  try {
-    debuglog(`Load command class: ${name}`);
-    commandsClasses[name.split('-').pop()] = requireFn(name, packageFile);
-  } catch (e) {
-    process.stderr.write(`Error while loading command class: ${name}\n`);
-    process.exit(2);
-  }
-});
+const commandsClasses = {
+  ...getLocalCommands(LOCAL_FOLDERS, packageFile),
+  ...getSubpackagesCommands(subpackages, pattern, packageFile),
+};
 
 function checkArgs(cmd, args, config) {
   const cfg = [];

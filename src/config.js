@@ -38,6 +38,6 @@ export const LOCAL_FOLDERS = arrayify(configObject.localCommands || []);
 export const CONFIG_FILE = configObject.configFile || c.DEFAUL_CONFIG_FILE;
 export const GLOBAL_CONFIG_FILE = `${os.homedir()}/${CONFIG_FILE}`;
 export const BASE_CONFIG = configObject.baseConfig || {};
-export const names = scope.reduce((result, prop) => (
+export const subpackages = scope.reduce((result, prop) => (
   result.concat(Object.keys(configObject[prop] || {}))
 ), []);
