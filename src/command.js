@@ -1,5 +1,7 @@
-import { arrayify, isRequired } from './utils';
+import { arrayify, isPositional, isRequired } from './utils';
 import * as c from './const';
+import * as prompt from './prompt';
+
 
 const BASE_PARSER_CFG = { addHelp: true };
 
@@ -79,4 +81,75 @@ export function defineNamespace(name, classes, parentParser) {
     },
     {}
   );
+}
+
+function checkArgs(parser, cmd, args, config) {
+  const cfg = [];
+  for (const param of getCommandArgs(cmd)) {
+    if (isRequired(param.id, param.cfg) || param.cfg.isPassword) {
+      const revealedParam = isPositional(param.id) ?
+        parser._getPositional(param.id, param.cfg) :
+        parser._getOptional(param.id, param.cfg);
+
+      param.cfg.typeFunction = parser._registryGet('type', param.cfg.type, param.cfg.type);
+      const val = args[revealedParam.dest];
+
+      if ((val === null && !param.cfg.isPassword) ||
+          (param.cfg.isPassword && val === c.EMPTY_PASSWORD)) {
+        const promptConfig = prompt.mapArgs(param.id, revealedParam, config);
+        cfg.push(promptConfig);
+      }
+    }
+  }
+
+  return prompt.argsSelector(cfg)
+    .then(answers => ({
+      ...args,
+      ...answers,
+    }));
+}
+
+export function getCurrentCommand(commands, args) {
+  let i = 'root';
+  let command = commands[i];
+  while (!command.isCommand) {
+    i = args[i];
+    command = command[i];
+  }
+  return command;
+}
+
+export function execute(command, config, cmdArgs, parser) {
+  let args = cmdArgs;
+
+  if (typeof command.getArgs === 'function' || Array.isArray(command.args)) {
+    args = config.then((cfg) => checkArgs(parser, command, args, cfg));
+  }
+
+  Promise.all([
+    Promise.resolve(args),
+    config,
+  ]).then((result) => {
+    args = result[0];
+    const cfg = result[1];
+
+    // Execute exec function
+    Promise.resolve(command.exec(args, cfg))
+      .then(results => {
+        // Execute print function if available
+        if (typeof command.print === 'function') {
+          command.print(results, args, cfg);
+        }
+      })
+      .catch(err => {
+        // Execute local catch function if available
+        // Internal command errors handler
+        if (typeof command.catch === 'function') {
+          command.catch(err, args, cfg);
+        } else {
+          // global commands errors handler
+          process.stderr.write(`Error while executing command: ${err}\n`);
+        }
+      });
+  });
 }

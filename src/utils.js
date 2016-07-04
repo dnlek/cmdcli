@@ -17,27 +17,28 @@ export function arrayify(el) {
   return Array.isArray(el) ? el : [el];
 }
 
-export function requireFn(name, packageFile) {
+export function requireFn(name, packageDir) {
+  debuglog(`require module ${name} from ${packageDir}`);
   // This searches up from the specified package.json file, making sure
   // the config option behaves as expected. See issue #56.
-  const src = resolve.sync(name, { basedir: path.dirname(packageFile) });
+  const src = resolve.sync(name, { basedir: packageDir });
   return require(src);
 }
 
-export function getLocalCommands(folders, packageFile) {
+export function getLocalCommands(folders, packageDir) {
   return folders.reduce((mem, name) => ({
     ...mem,
-    ...requireFn(name, packageFile),
+    ...requireFn(name, packageDir),
   }), {});
 }
 
-export function getSubpackagesCommands(subpackages, pattern, packageFile) {
+export function getSubpackagesCommands(subpackages, pattern, packageDir) {
   return micromatch(subpackages, pattern).reduce((mem, name) => {
     try {
       debuglog(`Load command class: ${name}`);
       return {
         ...mem,
-        [name.split('-').pop()]: requireFn(name, packageFile),
+        [name.split('-').pop()]: requireFn(name, packageDir),
       };
     } catch (e) {
       process.stderr.write(`Error while loading command class: ${name}\n`);
