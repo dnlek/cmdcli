@@ -1,22 +1,10 @@
 import findup from 'findup-sync';
 import path from 'path';
-import winston from 'winston';
 import { arrayify } from './utils';
 import * as c from './const';
 import os from 'os';
 import resolve from 'resolve';
-import util from 'util';
-
-export const logger = new winston.Logger({
-  transports: [
-    new winston.transports.Console({
-      handleExceptions: true,
-    }),
-  ],
-  exitOnError: false,
-});
-
-export const debuglog = util.debuglog('cmdcli');
+import { debuglog } from './logs';
 
 // Iterate module parents to find parent npm package
 let parentPackage = module.parent;

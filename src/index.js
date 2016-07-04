@@ -4,7 +4,8 @@ import { isPositional, isRequired, getCommandArgs, loadConfig } from './utils';
 import micromatch from 'micromatch';
 import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
-        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, logger, debuglog } from './config';
+        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE } from './config';
+import { logger, debuglog } from './logs';
 import complete from './complete';
 import * as prompt from './prompt';
 import { defineNamespace } from './commands';
