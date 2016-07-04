@@ -1,15 +1,13 @@
 import 'babel-polyfill';
 const ArgumentParser = require('argparse').ArgumentParser;
-import { arrayify, isPositional, isRequired,
-        getCommandArgs, loadConfig } from './utils';
+import { isPositional, isRequired, getCommandArgs, loadConfig } from './utils';
 import micromatch from 'micromatch';
 import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, logger, debuglog } from './config';
 import complete from './complete';
 import * as prompt from './prompt';
-
-const BASE_PARSER_CFG = { addHelp: true };
+import { defineNamespace } from './commands';
 
 let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
@@ -55,51 +53,6 @@ function checkArgs(cmd, args, config) {
     }));
 }
 
-function defineCommand(parentParser, cmdName, CmdCls) {
-  const cmdParserCfg = { ...BASE_PARSER_CFG };
-  const command = new CmdCls();
-  command.isCommand = true;
-
-  if (typeof command.aliases !== 'undefined') {
-    cmdParserCfg.aliases = arrayify(command.aliases);
-  }
-
-  const cmdParser = parentParser.addParser(cmdName, cmdParserCfg);
-
-  for (const param of getCommandArgs(command)) {
-    cmdParser.addArgument(param.id, param.cfg);
-  }
-
-  return command;
-}
-
-
-function defineTopCommand(name, classes, parentParser) {
-  const subparsers = parentParser.addSubparsers({
-    title: '',
-    dest: name,
-  });
-
-  return Object.keys(classes).reduce(
-    (mem, cmdName) => {
-      const CmdCls = classes[cmdName];
-      let cmd;
-      if (typeof CmdCls === 'function') {
-        cmd = defineCommand(subparsers, cmdName, CmdCls);
-      } else {
-        const cmdParserCfg = { ...BASE_PARSER_CFG };
-        const cmdParser = subparsers.addParser(cmdName, cmdParserCfg);
-        cmd = defineTopCommand(cmdName, CmdCls, cmdParser);
-      }
-
-      arrayify([cmdName, ...(cmd.aliases || [])]).forEach(alias => (mem[alias] = cmd));
-
-      return mem;
-    },
-    {}
-  );
-}
-
 const parser = new ArgumentParser({
   addHelp: true,
   description: `${configObject.name} // ${configObject.description}`,
@@ -124,7 +77,7 @@ parser.addArgument(['--silent'], {
   action: 'storeTrue',
 });
 
-const commands = { root: defineTopCommand('root', commandsClasses, parser) };
+const commands = { root: defineNamespace('root', commandsClasses, parser) };
 
 if (!complete(binEntryPoint, commands, parser)) {
   let args = parser.parseArgs();
@@ -167,14 +120,18 @@ if (!complete(binEntryPoint, commands, parser)) {
 
     Promise.resolve(command.exec(args, cfg))
       .then(results => {
+        // Execute print function if available
         if (typeof command.print === 'function') {
           command.print(results, args, cfg);
         }
       })
       .catch(err => {
+        // Execute local catch function if available
+        // Internal command errors handler
         if (typeof command.catch === 'function') {
           command.catch(err, args, cfg);
         } else {
+          // global commands errors handler
           process.stderr.write(`Error while executing command: ${err}\n`);
         }
       });
