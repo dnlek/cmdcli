@@ -1,9 +1,8 @@
 import findup from 'findup-sync';
 import path from 'path';
-import { arrayify } from './utils';
+import { arrayify, requireFn } from './utils';
 import * as c from './const';
 import os from 'os';
-import resolve from 'resolve';
 import { debuglog } from './logs';
 
 // Iterate module parents to find parent npm package
@@ -24,16 +23,9 @@ debuglog(`CONFIG: packageFile = ${packageFile}`);
 const configFile = findup('.cmdclirc.json', { cwd: parentDir });
 debuglog(`CONFIG: configFile = ${configFile}`);
 
-export const requireFn = (name) => {
-  // This searches up from the specified package.json file, making sure
-  // the config option behaves as expected. See issue #56.
-  const src = resolve.sync(name, { basedir: path.dirname(packageFile) });
-  return require(src);
-};
-
 export const configObject = {
-  ...requireFn(packageFile),
-  ...requireFn(configFile),
+  ...requireFn(packageFile, packageFile),
+  ...requireFn(configFile, packageFile),
 };
 
 export const binEntryPoint = configObject.bin && Object.keys(configObject.bin).length ?

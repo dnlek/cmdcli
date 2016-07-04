@@ -1,9 +1,9 @@
 import 'babel-polyfill';
 const ArgumentParser = require('argparse').ArgumentParser;
-import { isPositional, isRequired, loadConfig } from './utils';
+import { isPositional, isRequired, loadConfig, requireFn } from './utils';
 import micromatch from 'micromatch';
 import * as c from './const';
-import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
+import { names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
         BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE } from './config';
 import { logger, debuglog } from './logs';
 import complete from './complete';

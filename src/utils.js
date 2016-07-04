@@ -1,6 +1,7 @@
 import findParentDir from 'find-parent-dir';
 import fs from 'fs';
 import path from 'path';
+import resolve from 'resolve';
 
 export function isPositional(id) {
   return (!id.some((item) => item.indexOf('-') === 0));
@@ -14,22 +15,34 @@ export function arrayify(el) {
   return Array.isArray(el) ? el : [el];
 }
 
+export function requireFn(name, packageFile) {
+  // This searches up from the specified package.json file, making sure
+  // the config option behaves as expected. See issue #56.
+  const src = resolve.sync(name, { basedir: path.dirname(packageFile) });
+  return require(src);
+}
+
 export function getConfig(file, startDir) {
-  return new Promise((resolve) => {
+  return new Promise((resolveConfig) => {
     findParentDir(startDir, file, (err, dir) => {
       if (!err && dir) {
         fs.readFile(`${dir}/${file}`, 'utf8', (rerr, data) =>
-          resolve({ data: JSON.parse(data), dir, file: `${dir}/${file}` }));
+          resolveConfig({ data: JSON.parse(data), dir, file: `${dir}/${file}` }));
       } else {
-        resolve({ data: {}, dir: null, file: null });
+        resolveConfig({ data: {}, dir: null, file: null });
       }
     });
   });
 }
 
 function updateConfig(file, data) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(`${file}`, JSON.stringify(data), 'utf8', err => (err ? reject(err) : resolve()));
+  return new Promise((resolveConfig, reject) => {
+    fs.writeFile(
+      `${file}`,
+      JSON.stringify(data),
+      'utf8',
+      err => (err ? reject(err) : resolveConfig())
+    );
   });
 }
 
