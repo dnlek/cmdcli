@@ -18,7 +18,7 @@ if (parentPackage === null) {
 
 const parentDir = path.dirname(parentPackage.filename);
 debuglog(`CONFIG: parentDir = ${parentDir}`);
-const packageFile = findup('package.json', { cwd: parentDir });
+export const packageFile = findup('package.json', { cwd: parentDir });
 debuglog(`CONFIG: packageFile = ${packageFile}`);
 const configFile = findup('.cmdclirc.json', { cwd: parentDir });
 debuglog(`CONFIG: configFile = ${configFile}`);

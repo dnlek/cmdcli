@@ -4,7 +4,7 @@ import { isPositional, isRequired, loadConfig, requireFn } from './utils';
 import micromatch from 'micromatch';
 import * as c from './const';
 import { names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
-        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE } from './config';
+        BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE, packageFile } from './config';
 import { logger, debuglog } from './logs';
 import complete from './complete';
 import * as prompt from './prompt';
@@ -14,14 +14,14 @@ let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
   commandsClasses = {
     ...commandsClasses,
-    ...requireFn(name),
+    ...requireFn(name, packageFile),
   };
 });
 
 micromatch(names, pattern).forEach((name) => {
   try {
     debuglog(`Load command class: ${name}`);
-    commandsClasses[name.split('-').pop()] = requireFn(name);
+    commandsClasses[name.split('-').pop()] = requireFn(name, packageFile);
   } catch (e) {
     process.stderr.write(`Error while loading command class: ${name}\n`);
     process.exit(2);
