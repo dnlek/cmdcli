@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 const ArgumentParser = require('argparse').ArgumentParser;
-import { isPositional, isRequired, getCommandArgs, loadConfig } from './utils';
+import { isPositional, isRequired, loadConfig } from './utils';
 import micromatch from 'micromatch';
 import * as c from './const';
 import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
@@ -8,7 +8,7 @@ import { requireFn, names, pattern, LOCAL_FOLDERS, configObject, binEntryPoint,
 import { logger, debuglog } from './logs';
 import complete from './complete';
 import * as prompt from './prompt';
-import { defineNamespace } from './commands';
+import { defineNamespace, getCommandArgs } from './commands';
 
 let commandsClasses;
 LOCAL_FOLDERS.forEach((name) => {
