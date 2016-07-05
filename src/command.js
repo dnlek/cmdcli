@@ -27,11 +27,12 @@ export function *getCommandArgs(command) {
   if (params) {
     for (const param of params) {
       const p = arrayify(param);
-      const cfg = (typeof p[p.length - 1] === 'object') ?
-        p.pop() : {};
+      const cfg = (p.length > 1 &&
+        typeof p[p.length - 1] === 'object' &&
+        !Array.isArray(p[p.length - 1])) ?
+          p.pop() : {};
       const id = (Array.isArray(p[0])) ?
         p[0] : p;
-
       yield {
         id,
         cfg: mapArgparse(id, cfg),
