@@ -38,7 +38,7 @@
     "babel-polyfill": "^6.7.4",
     "find-parent-dir": "^0.3.0",
     "findup-sync": "^0.4.0",
-    "generator-cmdcli": "^0.1.0",
+    "generator-cmdcli": "^0.2.0",
     "inquirer": "^1.0.0",
     "micromatch": "^2.3.8",
     "path": "^0.12.7",
