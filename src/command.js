@@ -134,38 +134,41 @@ export function getCurrentCommand(commands, args) {
   return command;
 }
 
-export function execute(cmd, config, cmdArgs, parser) {
+export function resolve(cmd, config, cmdArgs, parser) {
   let args;
   const command = cmd.cmd;
 
   if (typeof command.getArgs === 'function' || Array.isArray(command.args)) {
-    args = config.then((cfg) => checkArgs(parser, command, cmdArgs, cfg));
+    args = Promise.resolve(config).then((cfg) => checkArgs(parser, command, cmdArgs, cfg));
   }
 
-  Promise.all([
+  return Promise.all([
     Promise.resolve(args),
-    config,
-  ]).then((result) => {
-    args = { ...result[0], ...cmd.args };
-    const cfg = result[1];
+    Promise.resolve(config),
+  ]).then((result) => ({
+    command,
+    args: { ...result[0], ...cmd.args },
+    cfg: result[1],
+  }));
+}
 
-    // Execute exec function
-    Promise.resolve(command.exec(args, cfg))
-      .then(results => {
-        // Execute print function if available
-        if (typeof command.print === 'function') {
-          command.print(results, args, cfg);
-        }
-      })
-      .catch(err => {
-        // Execute local catch function if available
-        // Internal command errors handler
-        if (typeof command.catch === 'function') {
-          command.catch(err, args, cfg);
-        } else {
-          // global commands errors handler
-          process.stderr.write(`Error while executing command: ${err}\n`);
-        }
-      });
-  });
+export function execute(item) {
+  // Execute exec function
+  Promise.resolve(item.command.exec(item.args, item.cfg))
+    .then(results => {
+      // Execute print function if available
+      if (typeof item.command.print === 'function') {
+        item.command.print(results, item.args, item.cfg);
+      }
+    })
+    .catch(err => {
+      // Execute local catch function if available
+      // Internal command errors handler
+      if (typeof item.command.catch === 'function') {
+        item.command.catch(err, item.args, item.cfg);
+      } else {
+        // global commands errors handler
+        process.stderr.write(`Error while executing command: ${err}\n`);
+      }
+    });
 }

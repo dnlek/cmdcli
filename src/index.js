@@ -6,7 +6,7 @@ import { subpackages, pattern, LOCAL_FOLDERS,
 import { logger } from './logs';
 import * as c from './const';
 import complete from './complete';
-import { defineNamespace, execute, getCurrentCommand } from './command';
+import { defineNamespace, resolve, execute, getCurrentCommand } from './command';
 import { getParser } from './parser';
 
 const commandsClasses = {
@@ -34,7 +34,8 @@ if (!complete(binEntryPoint, commands, parser)) {
   const command = getCurrentCommand(commands, args);
   const config = loadConfig(args.global, BASE_CONFIG, GLOBAL_CONFIG_FILE, CONFIG_FILE);
 
-  execute(command, config, args, parser);
+  resolve(command, config, args, parser)
+    .then(execute);
 }
 
 export {
