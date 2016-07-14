@@ -1,7 +1,7 @@
 import { arrayify, isPositional, isRequired } from './utils';
 import * as c from './const';
 import * as prompt from './prompt';
-
+import { debuglog } from './logs';
 
 const BASE_PARSER_CFG = { addHelp: true };
 
@@ -42,6 +42,7 @@ export function *getCommandArgs(command) {
 }
 
 function defineCommand(parentParser, cmdName, CmdCls) {
+  debuglog(`DEFINE COMMAND =  ${cmdName}`);
   const cmdParserCfg = { ...BASE_PARSER_CFG };
   const command = new CmdCls();
   command.isCommand = true;
@@ -75,6 +76,7 @@ function mapAliases(cmd) {
 }
 
 export function defineNamespace(name, classes, parentParser) {
+  debuglog(`DEFINE NAMESPACE =  ${name}`);
   const subparsers = parentParser.addSubparsers({
     title: '',
     dest: name,
@@ -127,10 +129,13 @@ function checkArgs(parser, cmd, args, config) {
 export function getCurrentCommand(commands, args) {
   let i = 'root';
   let command = commands[i];
-  while (command && !command.cmd) {
+  const path = [i];
+  while (command && (!command.cmd || !command.cmd.isCommand)) {
     i = args[i];
-    command = command[i];
+    command = command[i] || command.cmd[i];
+    path.push(i);
   }
+  debuglog(`CALL PATH: ${path.join(', ')}`);
   return command;
 }
 
